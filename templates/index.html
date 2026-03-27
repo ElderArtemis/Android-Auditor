@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AndroidAuditor v1.0 — Mobile Security Audit</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="1.5">
+        <rect x="5" y="2" width="14" height="20" rx="2"/>
+        <path d="M12 18h.01"/>
+        <path d="M8 6h8"/>
+        <path d="M15 1l1.5 1.5M9 1L7.5 2.5"/>
+      </svg>
+    </div>
+    <div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <div class="logo-text">ANDROID AUDITOR</div>
+        <div class="logo-ver">v1.0</div>
+      </div>
+      <div class="logo-sub">MOBILE SECURITY AUDIT TOOL · ADB Backend · Local Only</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"><div class="dot disconnected" id="statusDot"></div> <span id="deviceName">No device connected</span></div>
+    <div id="clock"></div>
+  </div>
+</header>
+
+<!-- Device status bar -->
+<div class="device-bar">
+  <div class="device-info">
+    <span class="device-badge disconnected" id="deviceBadge">NO DEVICE</span>
+    <span style="color:var(--text3)">ADB:</span>
+    <span id="adbPath" style="color:var(--text2)">detecting...</span>
+  </div>
+  <button id="refreshBtn">↻ REFRESH</button>
+</div>
+
+<nav class="nav-tabs">
+  <button class="nav-tab active" data-panel="scan">⬡ AUDIT</button>
+  <button class="nav-tab" data-panel="about">⬡ SETUP</button>
+</nav>
+
+<main>
+
+  <!-- AUDIT PANEL -->
+  <div class="panel-view active" id="panel-scan">
+
+    <!-- Connection screen -->
+    <div class="connect-screen" id="connectScreen">
+      <div class="connect-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3ddc84" stroke-width="1.5" width="32" height="32">
+          <rect x="5" y="2" width="14" height="20" rx="2"/>
+          <path d="M12 18h.01"/><path d="M8 6h8"/>
+        </svg>
+      </div>
+      <div class="connect-title">CONNECT YOUR DEVICE</div>
+      <div class="connect-sub">Connect an Android device via USB and enable USB Debugging to start the security audit.</div>
+      <div class="connect-steps">
+        <div class="connect-step"><span class="connect-step-num">1.</span><span>Connect device via USB cable</span></div>
+        <div class="connect-step"><span class="connect-step-num">2.</span><span>Settings → About Phone → tap Build Number 7 times</span></div>
+        <div class="connect-step"><span class="connect-step-num">3.</span><span>Settings → Developer Options → Enable USB Debugging</span></div>
+        <div class="connect-step"><span class="connect-step-num">4.</span><span>Accept the authorization popup on the device</span></div>
+        <div class="connect-step"><span class="connect-step-num">5.</span><span>Click REFRESH above — status should turn green</span></div>
+      </div>
+    </div>
+
+    <div class="scan-section">
+      <div class="scan-label">Run a complete security audit of the connected Android device via ADB.</div>
+      <button id="scanBtn" disabled>⟩ START AUDIT</button>
+      <button id="exportBtn">⬇ EXPORT JSON</button>
+    </div>
+
+    <div class="progress-section" id="progressSection">
+      <div class="progress-header">
+        <span id="progressLabel">INITIALIZING...</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar"></div></div>
+      <div class="scan-log" id="scanLog"></div>
+    </div>
+
+    <div class="grade-bar" id="gradeBar" style="display:none"></div>
+    <div class="modules-grid" id="modulesGrid" style="display:none"></div>
+  </div>
+
+  <!-- SETUP PANEL -->
+  <div class="panel-view" id="panel-about">
+    <div style="font-family:var(--mono);font-size:10px;color:var(--android);letter-spacing:3px;margin-bottom:20px">▶ SETUP & REQUIREMENTS</div>
+    <div class="modules-grid" style="grid-template-columns:1fr 1fr">
+      <div class="module">
+        <div class="module-header"><div class="module-title">Requirements</div></div>
+        <div class="module-body">
+          <div class="data-row"><div class="data-key">ADB</div><div class="data-val ok">Android Studio SDK</div></div>
+          <div class="data-row"><div class="data-key">PYTHON</div><div class="data-val ok">3.13+</div></div>
+          <div class="data-row"><div class="data-key">USB CABLE</div><div class="data-val ok">Data cable (not charge-only)</div></div>
+          <div class="data-row"><div class="data-key">USB DEBUGGING</div><div class="data-val warn">Must be enabled on device</div></div>
+          <div class="data-row"><div class="data-key">K8S DEPLOY</div><div class="data-val danger">NOT APPLICABLE (local only)</div></div>
+          <div class="data-row"><div class="data-key">API KEYS</div><div class="data-val ok">NONE NEEDED</div></div>
+        </div>
+      </div>
+      <div class="module">
+        <div class="module-header"><div class="module-title">What it audits</div></div>
+        <div class="module-body">
+          <div class="data-row"><div class="data-key">DEVICE INFO</div><div class="data-val ok">Model, Android, patch date</div></div>
+          <div class="data-row"><div class="data-key">ENCRYPTION</div><div class="data-val ok">Storage encryption status</div></div>
+          <div class="data-row"><div class="data-key">APPS</div><div class="data-val ok">All packages + permissions</div></div>
+          <div class="data-row"><div class="data-key">SIDELOADED</div><div class="data-val ok">APKs outside Play Store</div></div>
+          <div class="data-row"><div class="data-key">WIFI</div><div class="data-val ok">Saved networks + VPN + proxy</div></div>
+          <div class="data-row"><div class="data-key">CERTIFICATES</div><div class="data-val ok">User CA certs (MITM risk)</div></div>
+          <div class="data-row"><div class="data-key">ROOT</div><div class="data-val ok">Root detection</div></div>
+        </div>
+      </div>
+      <div class="module" style="grid-column:1/-1">
+        <div class="module-header"><div class="module-title">ADB Commands used</div></div>
+        <div class="module-body">
+          <div class="data-row"><div class="data-key">DEVICE</div><div class="data-val" style="font-size:9px">getprop ro.* · settings get global/secure *</div></div>
+          <div class="data-row"><div class="data-key">APPS</div><div class="data-val" style="font-size:9px">pm list packages -f/-3/-s · dumpsys package</div></div>
+          <div class="data-row"><div class="data-key">NETWORK</div><div class="data-val" style="font-size:9px">dumpsys wifi · dumpsys connectivity · settings get global http_proxy</div></div>
+          <div class="data-row"><div class="data-key">CERTS</div><div class="data-val" style="font-size:9px">ls /data/misc/user/0/cacerts-added/</div></div>
+          <div class="data-row"><div class="data-key">ROOT</div><div class="data-val" style="font-size:9px">su -c 'id' · pm list packages | grep magisk</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>⬡ ANDROID AUDITOR v1.0 · LOCAL TOOL — NO K8S DEPLOY · FOR AUTHORIZED DEVICES ONLY ⬡</footer>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
